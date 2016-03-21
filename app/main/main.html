@@ -11,6 +11,16 @@
 <button ng-click="addOriginCity($event)"type="button" class="btn btn-default">Add Airport</button>
   <br>
 <ul class="list-group">
-  <li ng-repeat="origin in originCities" class="list-group-item">{{origin}}</li>
+  <li ng-repeat="origin in originCities" class="list-group-item">
+    <span class="glyphicon glyphicon-pushpin" aria-hidden="true"></span>{{origin}}
+  </li>
 </ul>
 <button ng-click="query($event)"type="button" class="btn btn-default">Go!</button>
+<div id="myProgress">
+    <div id="myBar"></div>
+</div>
+<ul class="list-group">
+  <li ng-repeat="option in tripOptions" class="list-group-item">
+    <span class="glyphicon glyphicon-plane" aria-hidden="true"></span>{{option.destination}} --- {{option.price}}
+  </li>
+</ul>

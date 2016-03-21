@@ -21,7 +21,8 @@ mainModule.controller('MainCtrl', ['$scope', '$http', '$q', function($scope,$htt
   $scope.originCity="JFK";
   $scope.windowStart="2016-04-01";
   $scope.windowEnd="2016-04-30";
-  
+  $scope.tripOptions=[];
+
   //JQuery
   $(function() {
     $("#datepickerStart").datepicker({ dateFormat: 'yy-mm-dd' });
@@ -29,11 +30,15 @@ mainModule.controller('MainCtrl', ['$scope', '$http', '$q', function($scope,$htt
   });
 
   $scope.query = function($event){
+    if($scope.originCities.length==0){
+      return false;
+    }
+    move();
     var promise = callAPIs($scope.originCities);
     promise.then(
       function(results){
         console.log("resolving outer promise");
-        doParsing(results);
+        $scope.tripOptions=doParsing(results);
       },
       function(errors){
         consolelog(errors);
@@ -42,7 +47,9 @@ mainModule.controller('MainCtrl', ['$scope', '$http', '$q', function($scope,$htt
   };
 
   $scope.addOriginCity = function($event){
-    $scope.originCities.push($scope.originCity);
+    if($scope.originCities.indexOf($scope.originCity)==-1){
+      $scope.originCities.push($scope.originCity);  
+    }
   }
 
   function callAPIs(originCities){
@@ -92,6 +99,7 @@ mainModule.controller('MainCtrl', ['$scope', '$http', '$q', function($scope,$htt
       return a.price - b.price;
     });
     console.log(tripOptionsByPrice);
+    return tripOptionsByPrice;
 
   };
 
@@ -129,6 +137,20 @@ mainModule.controller('MainCtrl', ['$scope', '$http', '$q', function($scope,$htt
   function transformDate(date){
     return date.replace(/-/g,"");
   }
+
+  function move() {
+    var elem = document.getElementById("myBar"); 
+    var width = 1;
+    var id = setInterval(frame, 30);
+    function frame() {
+        if (width >= 100) {
+            clearInterval(id);
+        } else {
+            width++; 
+            elem.style.width = width + '%'; 
+        }
+    }
+}
 
 }]);
 
