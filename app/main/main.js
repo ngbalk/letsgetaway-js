@@ -37,7 +37,6 @@ mainModule.controller('MainCtrl', ['$scope', '$http', '$q', function($scope,$htt
     var promise = callAPIs($scope.originCities);
     promise.then(
       function(results){
-        console.log("resolving outer promise");
         $scope.tripOptions=doParsing(results);
       },
       function(errors){
@@ -59,13 +58,11 @@ mainModule.controller('MainCtrl', ['$scope', '$http', '$q', function($scope,$htt
     var urlCalls=[];
     for (var i=0;i<originCities.length;i++){
       var origin=originCities[i];
-      console.log("searching "+origin);
       urlCalls.push($http.get('https://www.kayak.com/h/explore/api?airport='+origin+'&depart='+transformedWindowStart+'&return='+transformedWindowEnd));
     }
     $q.all(urlCalls)
     .then(
       function(results){
-        console.log("resolving inner promise");
         console.log(results);
         deferred.resolve(results);
       },
@@ -88,7 +85,8 @@ mainModule.controller('MainCtrl', ['$scope', '$http', '$q', function($scope,$htt
       if(result){
         var totalCost=calculateTotalCost(result);
         var tripOptionData={
-          destination: destination.airport.shortName,
+          destinationShortName: destination.airport.shortName,
+          destinationFullName: destination.city.name,
           price: totalCost,
           trips: result
         };
