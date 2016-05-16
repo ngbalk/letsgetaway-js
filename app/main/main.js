@@ -17,10 +17,15 @@ mainModule.config(['$routeProvider', function($routeProvider) {
  /* Controller */
 
 mainModule.controller('MainCtrl', ['$scope', '$http', '$q', function($scope,$http,$q) {
+  var market = "US";
+  var currency = "USD";
+  var locale = "en-UK";
+  var apiKey='ni166031138540314211499189868863';
+
   $scope.originCities=[];
   $scope.originCity="JFK";
-  $scope.windowStart="2016-04-01";
-  $scope.windowEnd="2016-04-30";
+  $scope.windowStart="2016-06-01";
+  $scope.windowEnd="2016-06-30";
   $scope.tripOptions=[];
 
   //JQuery
@@ -40,7 +45,7 @@ mainModule.controller('MainCtrl', ['$scope', '$http', '$q', function($scope,$htt
         $scope.tripOptions=doParsing(results);
       },
       function(errors){
-        consolelog(errors);
+        console.log(errors);
       }
     );
   };
@@ -58,7 +63,9 @@ mainModule.controller('MainCtrl', ['$scope', '$http', '$q', function($scope,$htt
     var urlCalls=[];
     for (var i=0;i<originCities.length;i++){
       var origin=originCities[i];
-      urlCalls.push($http.get('https://www.kayak.com/h/explore/api?airport='+origin+'&depart='+transformedWindowStart+'&return='+transformedWindowEnd));
+      var effectiveUrl = 'http://partners.api.skyscanner.net/apiservices/browsequotes/v1.0/'+market+'/'+currency+'/'+locale+'/'+origin+'/anywhere/'+$scope.windowStart+'/'+$scope.windowEnd+'?apiKey=ni166031138540314211499189868863';
+      console.log(effectiveUrl);
+      urlCalls.push($http.get(effectiveUrl));
     }
     $q.all(urlCalls)
     .then(
