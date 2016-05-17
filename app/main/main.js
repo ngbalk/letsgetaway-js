@@ -8,7 +8,7 @@ var mainModule = angular.module('mainModule', ['ngRoute']);
 
 mainModule.config(['$routeProvider', function($routeProvider) {
   $routeProvider
-  .when('/main', {
+  .when('/', {
     templateUrl: 'main/main.html',
     controller: 'MainCtrl'
   });
@@ -17,10 +17,6 @@ mainModule.config(['$routeProvider', function($routeProvider) {
  /* Controller */
 
 mainModule.controller('MainCtrl', ['$scope', '$http', '$q', function($scope,$http,$q) {
-  var market = "US";
-  var currency = "USD";
-  var locale = "en-UK";
-  var apiKey='ni166031138540314211499189868863';
 
   $scope.originCities=[];
   $scope.originCity="JFK";
@@ -63,9 +59,7 @@ mainModule.controller('MainCtrl', ['$scope', '$http', '$q', function($scope,$htt
     var urlCalls=[];
     for (var i=0;i<originCities.length;i++){
       var origin=originCities[i];
-      var effectiveUrl = 'http://partners.api.skyscanner.net/apiservices/browsequotes/v1.0/'+market+'/'+currency+'/'+locale+'/'+origin+'/anywhere/'+$scope.windowStart+'/'+$scope.windowEnd+'?apiKey=ni166031138540314211499189868863';
-      console.log(effectiveUrl);
-      urlCalls.push($http.get(effectiveUrl));
+      urlCalls.push($http.get('/api/v1/rest/'+origin+'/'+$scope.windowStart+'/'+$scope.windowEnd));
     }
     $q.all(urlCalls)
     .then(
@@ -82,44 +76,43 @@ mainModule.controller('MainCtrl', ['$scope', '$http', '$q', function($scope,$htt
     return deferred.promise;
   };
 
-  function doParsing(allTripData){
-    var tripOptionsByPrice=[]
-    var singleTripData=allTripData[0];
-    var destinations=singleTripData.data.destinations;
-    for(var i=0;i<destinations.length;i++){
-      var destination=destinations[i];
-      var result=isCommonDestination(destination, allTripData); //This returns an array of all trips to shared destination i.e. [tripFromLAX, tripFromJFK, tripFromSFO]... or false if not shared
+  function doParsing(travelDataArray){
+    var groupTripOptionsByPrice=[];
+    var travelDataObject=travelDataArray[0];
+    var tripQuotesArray=travelDataObject.data.Quotes;
+    for(var i=0;i<tripQuotesArray.length;i++){
+      var tripQuote=tripQuotesArray[i];
+      var result=isCommonDestination(tripQuote, travelDataArray); //This returns an array of all trips to shared destination i.e. [tripFromLAX, tripFromJFK, tripFromSFO]... or false if not shared
       if(result){
         var totalCost=calculateTotalCost(result);
-        var tripOptionData={
-          destinationShortName: destination.airport.shortName,
-          destinationFullName: destination.city.name,
-          price: totalCost,
-          trips: result
+        var groupTripOptionData={
+          destinationId: tripQuote.OutboundLeg.DestinationId,
+          destinationName: getDestinationNameById(tripQuote.OutboundLeg.DestinationId,travelDataObject),
+          totalCost: totalCost,
+          tripQuotes: result
         };
-        tripOptionsByPrice.push(tripOptionData);
+        groupTripOptionsByPrice.push(groupTripOptionData);
       }
     }
-    tripOptionsByPrice.sort(function(a,b){
-      return a.price - b.price;
+    groupTripOptionsByPrice.sort(function(a,b){
+      return a.totalCost - b.totalCost;
     });
-    console.log(tripOptionsByPrice);
-    return tripOptionsByPrice;
+    console.log(groupTripOptionsByPrice);
+    return groupTripOptionsByPrice;
 
   };
 
-  function isCommonDestination(keyDestination, allTripData){
-    var keyShortName=keyDestination.airport.shortName;
+  function isCommonDestination(tripQuote, travelDataArray){
+    var keyDestinationId=tripQuote.OutboundLeg.DestinationId;
     var allTripsToSharedDestination=[];
-    for(var j=0;j<allTripData.length;j++){
-      var singleTripData=allTripData[j];
+    for(var j=0;j<travelDataArray.length;j++){
+      var travelDataObject=travelDataArray[j];
       var foundMatch=false;
-      var destinations=singleTripData.data.destinations;
-      for(var i=0;i<destinations.length;i++){
-        var destination=destinations[i];
-        if(keyShortName==destination.airport.shortName){
-          destination["origin"]=singleTripData.data.origin.shortName; //Need to add information about origin because Kayak's returned destination objects don't say the origin 
-          allTripsToSharedDestination.push(destination);
+      var tripQuotesArray=travelDataObject.data.Quotes;
+      for(var i=0;i<tripQuotesArray.length;i++){
+        var tripQuote=tripQuotesArray[i];
+        if(keyDestinationId==tripQuote.OutboundLeg.DestinationId){
+          allTripsToSharedDestination.push(tripQuote);
           foundMatch=true;
         }
       }
@@ -134,7 +127,7 @@ mainModule.controller('MainCtrl', ['$scope', '$http', '$q', function($scope,$htt
     var totalCost=0;
     for(var i=0;i<allTripsToSharedDestination.length;i++){
       var trip=allTripsToSharedDestination[i];
-      totalCost+=trip.flightInfo.price;
+      totalCost+=trip.MinPrice;
     }
     return totalCost;
   };
@@ -155,7 +148,16 @@ mainModule.controller('MainCtrl', ['$scope', '$http', '$q', function($scope,$htt
             elem.style.width = width + '%'; 
         }
     }
-}
+  }
+  function getDestinationNameById(destinationId, travelDataObject){
+    console.log(travelDataObject);
+    var places = travelDataObject.data.Places;
+    for(var i=0;i<places.length;i++){
+      if(places[i].PlaceId==destinationId){
+        return places[i].Name;
+      }
+    }
+  }
 
 }]);
 
