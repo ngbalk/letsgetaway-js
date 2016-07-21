@@ -9,7 +9,7 @@ var mainModule = angular.module('mainModule', ['ngRoute']);
 mainModule.config(['$routeProvider', function($routeProvider) {
   $routeProvider
   .when('/', {
-    templateUrl: 'main/main.html',
+    templateUrl: 'app/main/main.html',
     controller: 'MainCtrl'
   });
 }]);
@@ -102,10 +102,10 @@ mainModule.controller('MainCtrl', ['$scope', '$http', '$q', function($scope,$htt
 
   };
 
-  function isCommonDestination(tripQuote, travelDataArray){
-    var keyDestinationId=tripQuote.OutboundLeg.DestinationId;
+  function isCommonDestination(keyTripQuote, travelDataArray){
+    var keyDestinationId=keyTripQuote.OutboundLeg.DestinationId;
     var allTripsToSharedDestination=[];
-    for(var j=0;j<travelDataArray.length;j++){
+    for(var j=1;j<travelDataArray.length;j++){
       var travelDataObject=travelDataArray[j];
       var foundMatch=false;
       var tripQuotesArray=travelDataObject.data.Quotes;
@@ -114,12 +114,14 @@ mainModule.controller('MainCtrl', ['$scope', '$http', '$q', function($scope,$htt
         if(keyDestinationId==tripQuote.OutboundLeg.DestinationId){
           allTripsToSharedDestination.push(tripQuote);
           foundMatch=true;
+          break;
         }
       }
       if(!foundMatch){
         return false;
       }
     }
+    allTripsToSharedDestination.push(keyTripQuote);
     return allTripsToSharedDestination;
   };
 

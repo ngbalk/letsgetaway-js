@@ -3,7 +3,7 @@ var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
 var app = express();
 
 //Mount dependencies
-app.use(express.static(__dirname+'/app'));
+app.use(express.static(__dirname+'/'));
 
 //Handle API calls
 app.get('/api/v1/rest/:originCity/:departureDate/:returnDate', function (req, res) {
