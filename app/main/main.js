@@ -20,9 +20,10 @@ mainModule.controller('MainCtrl', ['$scope', '$http', '$q', function($scope,$htt
 
   $scope.originCities=[];
   $scope.originCity="JFK";
-  $scope.windowStart="2016-06-01";
-  $scope.windowEnd="2016-06-30";
-  $scope.tripOptions=[];
+  $scope.windowStart="2016-09-01";
+  $scope.windowEnd="2016-09-30";
+  $scope.intTripOptions=[];
+  $scope.domTripOptions=[];
 
   //JQuery
   $(function() {
@@ -34,11 +35,21 @@ mainModule.controller('MainCtrl', ['$scope', '$http', '$q', function($scope,$htt
     if($scope.originCities.length==0){
       return false;
     }
-    move();
-    var promise = callAPIs($scope.originCities);
-    promise.then(
+    toggleSpinnerOn();
+    var domPromise = callAPIs($scope.originCities, "domestic");
+    var intPromise = callAPIs($scope.originCities, "international");
+    domPromise.then(
       function(results){
-        $scope.tripOptions=doParsing(results);
+        $scope.domTripOptions=doParsing(results);
+      },
+      function(errors){
+        console.log(errors);
+      }
+    );
+    intPromise.then(
+      function(results){
+        togglerSpinnerOff();
+        $scope.intTripOptions=doParsing(results);
       },
       function(errors){
         console.log(errors);
@@ -52,14 +63,14 @@ mainModule.controller('MainCtrl', ['$scope', '$http', '$q', function($scope,$htt
     }
   }
 
-  function callAPIs(originCities){
+  function callAPIs(originCities, dest){
     var transformedWindowStart=transformDate($scope.windowStart);
     var transformedWindowEnd=transformDate($scope.windowEnd);
     var deferred = $q.defer();
     var urlCalls=[];
     for (var i=0;i<originCities.length;i++){
       var origin=originCities[i];
-      urlCalls.push($http.get('/api/v1/rest/'+origin+'/'+$scope.windowStart+'/'+$scope.windowEnd));
+      urlCalls.push($http.get('/api/v1/rest/'+dest+'/'+origin));
     }
     $q.all(urlCalls)
     .then(
@@ -138,18 +149,13 @@ mainModule.controller('MainCtrl', ['$scope', '$http', '$q', function($scope,$htt
     return date.replace(/-/g,"");
   }
 
-  function move() {
-    var elem = document.getElementById("myBar"); 
-    var width = 1;
-    var id = setInterval(frame, 30);
-    function frame() {
-        if (width >= 100) {
-            clearInterval(id);
-        } else {
-            width++; 
-            elem.style.width = width + '%'; 
-        }
-    }
+  function toggleSpinnerOn() {
+    var elem = document.getElementById("spinner"); 
+    elem.style.display = "block";
+  }
+  function togglerSpinnerOff(){
+    var elem = document.getElementById("spinner"); 
+    elem.style.display = "none";
   }
   function getDestinationNameById(destinationId, travelDataObject){
     console.log(travelDataObject);
