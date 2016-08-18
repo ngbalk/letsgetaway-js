@@ -25,6 +25,6 @@ app.get('/*',function(req,res){
 	res.sendFile(__dirname+'/app/index.html');
 });
 
-app.listen(3000, function () {
-  console.log('Letsgetaway app started on port 3000');
+app.listen(8080, function () {
+  console.log('Letsgetaway app started on port 8080');
 });
