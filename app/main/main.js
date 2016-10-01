@@ -166,6 +166,22 @@ mainModule.controller('MainCtrl', ['$scope', '$http', '$q', function($scope,$htt
       }
     }
   }
+  $scope.getColor = function(index, list){
+    console.log(list);
+    var color1 = '#66ff99';
+    var color2 = '#ff4d4d';
+    var ratio = index/list.length;
+    var hex = function(x) {
+      x = x.toString(16);
+      return (x.length == 1) ? '0' + x : x;
+    };
+
+    var r = Math.ceil(parseInt(color1.substring(0,2), 16) * ratio + parseInt(color2.substring(0,2), 16) * (1-ratio));
+    var g = Math.ceil(parseInt(color1.substring(2,4), 16) * ratio + parseInt(color2.substring(2,4), 16) * (1-ratio));
+    var b = Math.ceil(parseInt(color1.substring(4,6), 16) * ratio + parseInt(color2.substring(4,6), 16) * (1-ratio));
+
+    var gradientColor = hex(r) + hex(g) + hex(b);
+  }
 
 }]);
 
