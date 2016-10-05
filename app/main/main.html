@@ -29,7 +29,7 @@
       <h2>Domestic</h2>
       <div class="scrollable-box">
         <ul class="list-group">
-          <li ng-repeat="option in domTripOptions" class="list-group-item" style="background-color:{{getColor(domTripOptions.indexOf(option),domTripOptions)}}">
+          <li ng-repeat="option in domTripOptions" class="list-group-item" style="background-color:#{{getColor(domTripOptions.indexOf(option),domTripOptions.length)}}">
             <span class="glyphicon glyphicon-plane" aria-hidden="true"></span>{{option.destinationName}} ({{option.destinationId}}) --- {{option.totalCost}}
           </li>
         </ul>
@@ -39,8 +39,8 @@
       <h2>International</h2>
       <div class="scrollable-box">
         <ul class="list-group">
-          <li ng-repeat="option in intTripOptions" class="list-group-item">
-            <span class="glyphicon glyphicon-plane" aria-hidden="true"></span>{{option.destinationName}} ({{option.destinationId}}) --- {{option.totalCost}}
+          <li ng-repeat="option in intTripOptions" class="list-group-item" style="background-color:#{{getColor(intTripOptions.indexOf(option),intTripOptions.length)}}">
+            <span class="glyphicon glyphicon-plane" aria-hidden="true"></span>{{option.destinationName}} ({{option.destinationId}}) --- {{option.totalCost}} 
           </li>
         </ul>
       </div>
