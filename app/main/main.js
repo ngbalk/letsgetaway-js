@@ -16,28 +16,28 @@ mainModule.config(['$routeProvider', function($routeProvider) {
  
  /* Controller */
 
-mainModule.controller('MainCtrl', ['$scope', '$http', '$q', function($scope,$http,$q) {
+mainModule.controller('MainCtrl', ['$rootScope', '$scope', '$http', '$q', function($rootScope, $scope,$http,$q) {
 
-  $scope.originCities=[];
+  /** Root scope variables**/
+  $rootScope.originCities=[];
+
+  /** Normal scope variables **/
   $scope.originCity="JFK";
-  $scope.windowStart="2016-09-01";
-  $scope.windowEnd="2016-09-30";
   $scope.intTripOptions=[];
   $scope.domTripOptions=[];
 
-  //JQuery
   $(function() {
     $("#datepickerStart").datepicker({ dateFormat: 'yy-mm-dd' });
     $("#datepickerEnd").datepicker({ dateFormat: 'yy-mm-dd' });
   });
 
   $scope.query = function($event){
-    if($scope.originCities.length==0){
+    if($rootScope.originCities.length==0){
       return false;
     }
     toggleSpinnerOn();
-    var domPromise = callAPIs($scope.originCities, "domestic");
-    var intPromise = callAPIs($scope.originCities, "international");
+    var domPromise = callAPIs(buildCheapestDestinationCalls($rootScope.originCities, "domestic"));
+    var intPromise = callAPIs(buildCheapestDestinationCalls($rootScope.originCities, "international"));
     domPromise.then(
       function(results){
         $scope.domTripOptions=doParsing(results);
@@ -58,20 +58,30 @@ mainModule.controller('MainCtrl', ['$scope', '$http', '$q', function($scope,$htt
   };
 
   $scope.addOriginCity = function($event){
-    if($scope.originCities.indexOf($scope.originCity)==-1){
-      $scope.originCities.push($scope.originCity);  
+    if($rootScope.originCities.indexOf($scope.originCity)==-1){
+      $rootScope.originCities.push($scope.originCity);  
     }
   }
 
-  function callAPIs(originCities, dest){
-    var transformedWindowStart=transformDate($scope.windowStart);
-    var transformedWindowEnd=transformDate($scope.windowEnd);
-    var deferred = $q.defer();
+  function buildCheapestDestinationCalls(originCities, dest){
     var urlCalls=[];
     for (var i=0;i<originCities.length;i++){
       var origin=originCities[i];
       urlCalls.push($http.get('/api/v1/rest/'+dest+'/'+origin));
     }
+    return urlCalls; 
+  }
+
+  function buildPriceGridCalls(originCities, dest, outboundMonth, inboundMonth){
+    var urlCalls=[];
+    for (var i=0;i<originCities.length;i++){
+      var origin=originCities[i];
+      urlCalls.push($http.get('/api/v1/rest/grid/'+origin+'/'+dest+'/'+outboundMonth+'/'+inboundMonth));
+    }
+  }
+
+  function callAPIs(urlCalls){
+    var deferred = $q.defer();
     $q.all(urlCalls)
     .then(
       function(results){
@@ -83,7 +93,6 @@ mainModule.controller('MainCtrl', ['$scope', '$http', '$q', function($scope,$htt
         deferred.reject(errors);
       }
     );
-
     return deferred.promise;
   };
 
@@ -179,6 +188,18 @@ mainModule.controller('MainCtrl', ['$scope', '$http', '$q', function($scope,$htt
     var b = Math.ceil(parseInt(color1.substring(4,6), 16) * ratio + parseInt(color2.substring(4,6), 16) * (1-ratio));
     var gradientColor = hex(r) + hex(g) + hex(b);
     return gradientColor;
+  }
+
+  function getPriceGrid(dest, outboundMonth, inboundMonth){
+    var promise = callAPIs(buildPriceGridCalls(dest, outboundMonth, inboundMonth));
+    promise.then(
+      function(result){
+        console.log(result);
+      },
+      function(errors){
+        console.log(errors);
+      }
+    );
   }
 
 }]);
