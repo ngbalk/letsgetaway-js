@@ -30,7 +30,7 @@
       <div class="scrollable-box">
         <ul class="list-group">
         <div ng-repeat="option in domTripOptions">
-          <my-select-dates-directive dest-name={{option.destinationName}} dest-id={{option.destinationId}}>
+          <my-select-dates-directive dest-id={{option.destinationId}}>
             <li class="list-group-item" style="background-color:#{{getColor(domTripOptions.indexOf(option),domTripOptions.length)}}">
               <span class="glyphicon glyphicon-plane" aria-hidden="true"></span>{{option.destinationName}} ({{option.destinationId}}) --- {{option.totalCost}}
             </li>
@@ -44,7 +44,7 @@
       <div class="scrollable-box">
         <ul class="list-group">
           <div ng-repeat="option in intTripOptions">
-            <my-select-dates-directive dest-name={{option.destinationName}} dest-id={{option.destinationId}}>
+            <my-select-dates-directive dest-id={{option.destinationId}}>
               <li  class="list-group-item" style="background-color:#{{getColor(intTripOptions.indexOf(option),intTripOptions.length)}}">
                 <span class="glyphicon glyphicon-plane" aria-hidden="true"></span>{{option.destinationName}} ({{option.destinationId}}) --- {{option.totalCost}} 
               </li>

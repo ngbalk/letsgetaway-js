@@ -7,21 +7,16 @@ selectDatesDirective.directive('mySelectDatesDirective', function() {
 		restrict: 'E',
 		transclude: true,
 		scope: {
-	      	destName: '@destName',
 	      	destId: '@destId',
-	      	destAirportCode: '@destArptCd'
     	},
 		templateUrl: 'app/directives/select-dates/select-dates.html',
 		controller: 'SelectDatesCtrl'
 	};
 });
 
-selectDatesDirective.controller('SelectDatesCtrl', ['$scope', '$rootScope', '$http', 'backendService', function($scope, $rootScope, $http, backendService){
+selectDatesDirective.controller('SelectDatesCtrl', ['$scope', '$rootScope', '$http', 'backendService', 'dataService', function($scope, $rootScope, $http, backendService, dataService){
 	$scope.priceGrid = [];
 	$scope.getPriceGrid = function(outboundMonth, inboundMonth){
-
-		//For testing
-		$scope.destAirportCode = 'LAX';
 
 		outboundMonth=resolveOutboundMonth(outboundMonth);
 		inboundMonth=resolveInboundMonth(inboundMonth);
@@ -29,7 +24,7 @@ selectDatesDirective.controller('SelectDatesCtrl', ['$scope', '$rootScope', '$ht
 		var urlCalls = [];
 		for (var i=0;i<$rootScope.originCities.length;i++){
 	      var origin=$rootScope.originCities[i];
-	      urlCalls.push($http.get('/api/v1/rest/grid/'+origin+'/'+$scope.destAirportCode+'/'+outboundMonth+'/'+inboundMonth));
+	      urlCalls.push($http.get('/api/v1/rest/grid/'+origin+'/'+dataService.getDestDataById($scope.destId).code+'/'+outboundMonth+'/'+inboundMonth));
 	    }
 	    var priceGridPromise = backendService.call(urlCalls);
 	    priceGridPromise.then(function(result){

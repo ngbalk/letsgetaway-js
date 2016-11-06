@@ -6,5 +6,6 @@ var letsgetaway = angular.module('letsgetaway', [
   'ngRoute',
   'mainModule',
   'selectDatesDirective',
-  'backendService'
+  'backendService',
+  'dataService'
   ]);

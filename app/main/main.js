@@ -16,7 +16,7 @@ mainModule.config(['$routeProvider', function($routeProvider) {
  
  /* Controller */
 
-mainModule.controller('MainCtrl', ['$rootScope', '$scope', '$http', '$q', function($rootScope, $scope,$http,$q) {
+mainModule.controller('MainCtrl', ['$rootScope', '$scope', '$http', '$q', 'dataService', function($rootScope, $scope,$http,$q,dataService) {
 
   /** Root scope variables**/
   $rootScope.originCities=[];
@@ -40,6 +40,8 @@ mainModule.controller('MainCtrl', ['$rootScope', '$scope', '$http', '$q', functi
     var intPromise = callAPIs(buildCheapestDestinationCalls($rootScope.originCities, "international"));
     domPromise.then(
       function(results){
+        /* Insert domestic dest data into dataService */
+        dataService.setDestData(results[0]);
         $scope.domTripOptions=doParsing(results);
       },
       function(errors){
@@ -49,6 +51,8 @@ mainModule.controller('MainCtrl', ['$rootScope', '$scope', '$http', '$q', functi
     intPromise.then(
       function(results){
         togglerSpinnerOff();
+        /* Insert international dest data into dataService */
+        dataService.setDestData(results[0]);
         $scope.intTripOptions=doParsing(results);
       },
       function(errors){

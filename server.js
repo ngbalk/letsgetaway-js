@@ -23,8 +23,9 @@ app.get('/api/v1/rest/international/:originCity', function (req, res) {
 
 /** Get price grid for specified inbound and outbound month **/
 app.get('/api/v1/rest/grid/:origin/:dest/:outboundMonth/:inboundMonth', function (req, res) {
+    console.log("makingthe call!!!!");
 	var xmlHttp = new XMLHttpRequest();
-	xmlHttp.open("GET", "http://partners.api.skyscanner.net/apiservices/browsegrid/v1.0/US/USD/en-UK/"+req.params.origin+"/"+req.params.dest+"/"+req.params.outboundMonth+"/"+req.params.inboundMonth+"?apiKey=prtl6749387986743898559646983194");
+	xmlHttp.open("GET", "http://partners.api.skyscanner.net/apiservices/browsegrid/v1.0/US/USD/en-UK/"+req.params.origin+"/"+req.params.dest+"/"+req.params.outboundMonth+"/"+req.params.inboundMonth+"?apiKey=prtl6749387986743898559646983194", false);
     xmlHttp.send( null );
     res.send(xmlHttp.responseText);
 });
