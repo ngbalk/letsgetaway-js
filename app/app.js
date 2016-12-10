@@ -7,5 +7,7 @@ var letsgetaway = angular.module('letsgetaway', [
   'mainModule',
   'selectDatesDirective',
   'backendService',
-  'dataService'
+  'flightsDataService',
+  'colorService',
+  'spinnerService'
   ]);
