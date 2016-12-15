@@ -1,4 +1,3 @@
-'use strict';
 
 /* Module */
 
@@ -18,32 +17,35 @@ mainModule.config(['$routeProvider', function($routeProvider) {
 
 mainModule.controller('MainCtrl', ['$rootScope','$scope','flightsDataService','spinnerService','colorService', function($rootScope,$scope,flightsDataService,spinnerService,colorService) {
 
-  /** Root scope variables**/
-  $rootScope.originCities=[];
-
-  /** Normal scope variables **/
+  $scope.originCities=[];
   $scope.originCity="JFK";
-  $scope.intTripOptions=[];
-  $scope.domTripOptions=[];
 
   $scope.getFlights = function($event){
-    if($rootScope.originCities.length===0){
+    if($scope.originCities.length===0){
       return false;
     }
     spinnerService.startSpinner();
-    $scope.domTripOptions=flightsDataService.getDomesticDestinations($rootScope.originCities);
-    $scope.intTripOptions=flightsDataService.getInternationalDestinations($rootScope.originCities);
-    spinnerService.stopSpinner();
+    Promise.all([flightsDataService.getDomesticDestinations($scope.originCities),
+                flightsDataService.getInternationalDestinations($scope.originCities)]).then(results => {
+                        $scope.domTripOptions=results[0];
+                        $scope.intTripOptions=results[1];
+                        spinnerService.stopSpinner();
+                        $scope.$apply();
+                });  
   };
 
   $scope.addOriginCity = function($event){
-    if($rootScope.originCities.indexOf($scope.originCity)==-1){
-      $rootScope.originCities.push($scope.originCity);  
+    if($scope.originCities.indexOf($scope.originCity)==-1){
+      $scope.originCities.push($scope.originCity);  
     }
   };
 
+  $scope.removeOriginCity = function(origin){
+    $scope.originCities.splice($scope.originCities.indexOf(origin),1);
+  };
+
   $scope.getColor = function(index, max){
-    colorService.getColor('ff4d4d','66ff99',index,max);
+    return colorService.getColor('ff4d4d','66ff99',index,max);
   };
 
 }]);

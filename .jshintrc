@@ -3,5 +3,6 @@
     "angular": true,
     "console": true,
     "$": true
-  }
+  },
+  "esversion": 6
 }

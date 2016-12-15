@@ -1,4 +1,3 @@
-'use strict';
 
 var dataService = angular.module('flightsDataService',[]);
 
@@ -7,7 +6,7 @@ dataService.factory('flightsDataService',['$q','$http','backendService',function
 
 	service.getDomesticDestinations=function(originCities){
     	var promise = backendService.call(buildCheapestDestinationCalls(originCities, "domestic"));
-    	promise.then(
+      var newPromise = promise.then(
       		function(results){
 	        	return doParsing(results);
 	    	},
@@ -15,11 +14,12 @@ dataService.factory('flightsDataService',['$q','$http','backendService',function
 	        	console.log(errors);
 	      	}
     	);
+      return newPromise;
 	};
 
 	service.getInternationalDestinations=function(originCities){
     	var promise = backendService.call(buildCheapestDestinationCalls(originCities, "international"));
-    	promise.then(
+    	var newPromise = promise.then(
       		function(results){
 	        	return doParsing(results);
 	    	},
@@ -27,6 +27,7 @@ dataService.factory('flightsDataService',['$q','$http','backendService',function
 	        	console.log(errors);
 	      	}
     	);
+      return newPromise;
 	};
 
 /*
@@ -44,9 +45,12 @@ dataService.factory('flightsDataService',['$q','$http','backendService',function
   }
 
   function doParsing(travelDataArray){
-    var groupTripOptionsByPrice=[];
     var travelDataObject=travelDataArray[0];
+    if(!travelDataObject){
+      return [];
+    }
     var tripQuotesArray=travelDataObject.data.Quotes;
+    var groupTripOptionsByPrice=[];
     for(var i=0;i<tripQuotesArray.length;i++){
       var tripQuote=tripQuotesArray[i];
       var result=isCommonDestination(tripQuote, travelDataArray); //This returns an array of all trips to shared destination i.e. [tripFromLAX, tripFromJFK, tripFromSFO]... or false if not shared

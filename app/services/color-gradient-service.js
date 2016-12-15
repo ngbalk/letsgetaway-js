@@ -1,10 +1,10 @@
 /**
-*  Module
+*  colorGService Module
 *
-* Description
+* Description: Returns a color within the specified range of colors
 */
 angular.module('colorService', []).factory('colorService', [function(){
-	return function getColor(color1, color2, index, max){
+	this.getColor = function(color1, color2, index, max){
 		var ratio = index/max;
 	    var hex = function(x) {
 	      x = x.toString(16);
@@ -16,4 +16,5 @@ angular.module('colorService', []).factory('colorService', [function(){
 	    var gradientColor = hex(r) + hex(g) + hex(b);
 	    return gradientColor;
 	};
+	return this;
 }]);

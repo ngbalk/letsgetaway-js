@@ -1,7 +1,7 @@
 /**
-* Module
+* spinnerService Module
 *
-* Description
+* Description: Service to toggle spinner on and off
 */
 angular.module('spinnerService', []).factory('spinnerService', [function(){
 	this.startSpinner=function(){

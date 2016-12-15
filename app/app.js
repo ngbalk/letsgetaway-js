@@ -10,4 +10,4 @@ var letsgetaway = angular.module('letsgetaway', [
   'flightsDataService',
   'colorService',
   'spinnerService'
-  ]);
+]);

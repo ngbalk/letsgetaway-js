@@ -2,30 +2,34 @@ var express = require('express');
 var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
 var app = express();
 
+var apiKey='prtl6749387986743898559646983194';
+
 //Mount dependencies
 app.use(express.static(__dirname+'/'));
 
 /** Get cheapest domestic destinations **/
 app.get('/api/v1/rest/domestic/:originCity', function (req, res) {
+    console.log("requesting domestic destinations");
 	var xmlHttp = new XMLHttpRequest();
-    xmlHttp.open( "GET", 'http://partners.api.skyscanner.net/apiservices/browsequotes/v1.0/US/USD/en-UK/'+req.params.originCity+'/US/anytime/anytime?apiKey=prtl6749387986743898559646983194', false ); // false for synchronous request
+    xmlHttp.open( "GET", 'http://partners.api.skyscanner.net/apiservices/browsequotes/v1.0/US/USD/en-UK/'+req.params.originCity+'/US/anytime/anytime?apiKey='+apiKey, false ); // false for synchronous request
     xmlHttp.send( null );
     res.send(xmlHttp.responseText);
 });
 
 /** Get cheapest international destinations **/
 app.get('/api/v1/rest/international/:originCity', function (req, res) {
+    console.log("requesting international destinations");
 	var xmlHttp = new XMLHttpRequest();
-    xmlHttp.open( "GET", 'http://partners.api.skyscanner.net/apiservices/browsequotes/v1.0/US/USD/en-UK/'+req.params.originCity+'/anywhere/anytime/anytime?apiKey=prtl6749387986743898559646983194', false ); // false for synchronous request
+    xmlHttp.open( "GET", 'http://partners.api.skyscanner.net/apiservices/browsequotes/v1.0/US/USD/en-UK/'+req.params.originCity+'/anywhere/anytime/anytime?apiKey='+apiKey, false ); // false for synchronous request
     xmlHttp.send( null );
     res.send(xmlHttp.responseText);
 });
 
 /** Get price grid for specified inbound and outbound month **/
 app.get('/api/v1/rest/grid/:origin/:dest/:outboundMonth/:inboundMonth', function (req, res) {
-    console.log("makingthe call!!!!");
+    console.log("requesting price grid");
 	var xmlHttp = new XMLHttpRequest();
-	xmlHttp.open("GET", "http://partners.api.skyscanner.net/apiservices/browsegrid/v1.0/US/USD/en-UK/"+req.params.origin+"/"+req.params.dest+"/"+req.params.outboundMonth+"/"+req.params.inboundMonth+"?apiKey=prtl6749387986743898559646983194", false);
+	xmlHttp.open("GET", "http://partners.api.skyscanner.net/apiservices/browsegrid/v1.0/US/USD/en-UK/"+req.params.origin+"/"+req.params.dest+"/"+req.params.outboundMonth+"/"+req.params.inboundMonth+"?apiKey="+apiKey, false);
     xmlHttp.send( null );
     res.send(xmlHttp.responseText);
 });

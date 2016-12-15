@@ -14,7 +14,7 @@ selectDatesDirective.directive('mySelectDatesDirective', function() {
 	};
 });
 
-selectDatesDirective.controller('SelectDatesCtrl', ['$scope', '$rootScope', '$http', 'backendService', 'dataService', function($scope, $rootScope, $http, backendService, dataService){
+selectDatesDirective.controller('SelectDatesCtrl', ['$scope', '$rootScope', '$http', 'backendService', 'flightsDataService', function($scope, $rootScope, $http, backendService, dataService){
 	$scope.priceGrid = [];
 	$scope.getPriceGrid = function(outboundMonth, inboundMonth){
 
@@ -34,7 +34,7 @@ selectDatesDirective.controller('SelectDatesCtrl', ['$scope', '$rootScope', '$ht
 	    function(errors){
 	    	console.log(errors);
 	    });
-	}
+	};
 
 	function resolveOutboundMonth(outboundMonth){
 		if(!outboundMonth){
