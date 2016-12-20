@@ -25,11 +25,11 @@ app.get('/api/v1/rest/international/:originCity', function (req, res) {
     res.send(xmlHttp.responseText);
 });
 
-/** Get price grid for specified inbound and outbound month **/
-app.get('/api/v1/rest/grid/:origin/:dest/:outboundMonth/:inboundMonth', function (req, res) {
+/** Get date grid for one-way search **/
+app.get('/api/v1/rest/grid/:origin/:dest/:outboundMonth', function (req, res) {
     console.log("requesting price grid");
 	var xmlHttp = new XMLHttpRequest();
-	xmlHttp.open("GET", "http://partners.api.skyscanner.net/apiservices/browsegrid/v1.0/US/USD/en-UK/"+req.params.origin+"/"+req.params.dest+"/"+req.params.outboundMonth+"/"+req.params.inboundMonth+"?apiKey="+apiKey, false);
+	xmlHttp.open("GET", "http://partners.api.skyscanner.net/apiservices/browsegrid/v1.0/US/USD/en-UK/"+req.params.origin+"/"+req.params.dest+"/"+req.params.outboundMonth+"?apiKey="+apiKey, false);
     xmlHttp.send( null );
     res.send(xmlHttp.responseText);
 });

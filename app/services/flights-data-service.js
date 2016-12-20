@@ -30,11 +30,77 @@ dataService.factory('flightsDataService',['$q','$http','backendService',function
       return newPromise;
 	};
 
+  service.getDateGrid=function(originCities,destination){
+     var promise = backendService.call(buildDateGridCalls(originCities,destination));
+          var newPromise = promise.then(
+          function(results){
+            return buildMonthGrid(doDateGridsArrayProcessing(results));
+        },
+          function(errors){
+            console.log(errors);
+          }
+      );
+      return newPromise;
+  };
+
+/*
+*  
+* Functions for getting price date gride
+*
+*/
+
+function buildMonthGrid(dateGrid){
+  var monthGrid = [];
+  var weekGrid = [];
+  for(var i = 0;i<dateGrid.length;i++){
+    var cur = dateGrid[i];
+    weekGrid[cur.date.getDay()]=cur;
+    if(cur.date.getDay()==6){
+      monthGrid.push(weekGrid);
+      weekGrid = [];
+    }
+  }
+  monthGrid.push(weekGrid);
+  return monthGrid;
+}
+
+function buildDateGridCalls(originCities,destination){
+  var urlCalls=[];
+  for (var i=0;i<originCities.length;i++){
+      var origin=originCities[i];
+      urlCalls.push($http.get('/api/v1/rest/grid/'+origin+'/'+destination+'/'+formatCurrentDate()));
+  }
+  console.log(urlCalls);
+  return urlCalls;
+}
+
+function doDateGridsArrayProcessing(datesGridsArray){
+  var totalPriceByDate = [];
+  for(var i = 0;i<datesGridsArray.length;i++){
+    var dateGrid=datesGridsArray[i].data;
+    for(var j = 0; j<dateGrid.Dates[0].length;j++){
+      if(!totalPriceByDate[j]){
+        var datePrice = {
+          dateString: dateGrid.Dates[0][j].DateString,
+          date: new Date(dateGrid.Dates[0][j].DateString),
+          price: dateGrid.Dates[1][j] !== null ? dateGrid.Dates[1][j].MinPrice : 0
+        };
+        totalPriceByDate[j]=datePrice;
+      }
+      else{
+        totalPriceByDate[j].price += dateGrid.Dates[1][j] !== null ? dateGrid.Dates[1][j].MinPrice : 0;
+      }
+    }
+  }
+  return totalPriceByDate;
+}
+
 /*
 *
 * Functions for getting and parsing flight data
 *
 */
+  
   function buildCheapestDestinationCalls(originCities, dest){
     var urlCalls=[];
     for (var i=0;i<originCities.length;i++){
@@ -59,6 +125,7 @@ dataService.factory('flightsDataService',['$q','$http','backendService',function
         var groupTripOptionData={
           destinationId: tripQuote.OutboundLeg.DestinationId,
           destinationName: getDestinationNameById(tripQuote.OutboundLeg.DestinationId,travelDataObject),
+          skyscannerCode: getSkyscannerCodeById(tripQuote.OutboundLeg.DestinationId,travelDataObject),
           totalCost: totalCost,
           tripQuotes: result
         };
@@ -105,14 +172,30 @@ dataService.factory('flightsDataService',['$q','$http','backendService',function
     return totalCost;
   }
 
-    function getDestinationNameById(destinationId, travelDataObject){
-    console.log(travelDataObject);
+  function getDestinationNameById(destinationId, travelDataObject){
     var places = travelDataObject.data.Places;
     for(var i=0;i<places.length;i++){
       if(places[i].PlaceId==destinationId){
         return places[i].Name;
       }
     }
+  }
+
+  function getSkyscannerCodeById(destinationId,travelDataObject){
+    var places = travelDataObject.data.Places;
+    for(var i=0;i<places.length;i++){
+      if(places[i].PlaceId==destinationId){
+        return places[i].SkyscannerCode;
+      }
+    }
+  }
+
+  function formatCurrentDate() {
+    var d = new Date(),
+        month = '' + (d.getMonth() + 1),
+        year = d.getFullYear();
+    if (month.length < 2) month = '0' + month;
+    return [year, month].join('-');
   }
 
 	return service;
