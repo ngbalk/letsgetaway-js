@@ -46,7 +46,7 @@
       <div class="scrollable-box">
         <ul class="list-group">
           <div ng-repeat="option in intTripOptions">
-            <my-select-dates-directive origins="originCities" dest-code={{skyscannerCode}}>
+            <my-select-dates-directive origins="originCities" dest-code={{option.skyscannerCode}}>
               <li  class="list-group-item" style="background-color:#{{getColor(intTripOptions.indexOf(option),intTripOptions.length)}}">
                 <span class="glyphicon glyphicon-plane" aria-hidden="true"></span>{{option.destinationName}} ({{option.destinationId}}) --- {{option.totalCost}} 
               </li>
